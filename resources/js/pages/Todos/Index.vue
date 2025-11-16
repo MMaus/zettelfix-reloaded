@@ -26,6 +26,9 @@ const page = usePage();
 const { syncStatus } = useSync();
 const isAuthenticated = computed(() => !!page.props.auth?.user);
 
+// Local storage for offline support
+const localTodos = useLocalStorage<TodoItem[]>('todos', []);
+
 // Sync server todos to local storage
 watch(() => props.todos, (newTodos) => {
     setLocalStorageItem('todos', newTodos);
@@ -127,7 +130,7 @@ const breadcrumbs = [
                     <SyncIndicator v-if="isAuthenticated" :status="syncStatus" class="mt-2" />
                 </div>
                 <Link v-if="canCreate" href="/todos/create">
-                    <Button>Create Todo</Button>
+                    <Button>Add Todo</Button>
                 </Link>
             </div>
 
