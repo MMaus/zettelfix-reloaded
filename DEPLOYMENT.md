@@ -58,6 +58,17 @@ npm run build
 
 This creates optimized assets in `public/build/` that will be deployed with your application.
 
+## Runtime Layout on the Preview Host
+
+- **Code root**: `~/zettelfix.de/preview`
+  - Sync the entire Laravel tree here: `app/`, `bootstrap/`, `config/`, `database/`, `public/`, `resources/`, `routes/`, `storage/`, `artisan`, `composer.json`, etc.
+  - Exclude `storage/` (user uploads, caches, logs) from deployments so server-generated data is preserved.
+- **Web root**: `~/zettelfix.de/preview/public`
+  - `public/index.php` and `.htaccess` already provide the Apache/LAMP entry point for both API and SPA assets.
+  - `public/build/` is replaced each deploy with the artifacts from `npm run build`.
+- **Environment**: `.env` and secrets stay only on the server; CI never copies them. Ensure `APP_KEY`, DB creds, and third-party keys are populated manually.
+- **Permissions**: Keep `storage/` and `bootstrap/cache` writable by the web server user (`www-data` or the hosting equivalent) and re-apply permissions post-rsync if needed.
+
 ### 2. Prepare Your Codebase
 
 ```bash
@@ -249,6 +260,41 @@ Update `.env`:
 ```env
 APP_URL=https://yourdomain.com
 ```
+
+## Post-Deployment Checklist
+
+## GitHub Actions Deployment Workflow (`.github/workflows/deploy.yml`)
+
+1. **Build & optimize in CI**
+   - Run `composer install --no-dev --optimize-autoloader` followed by `npm ci && npm run build` on every push.
+   - When environment values are available (e.g., copied from `.env.example` or injected as secrets), add `php artisan config:cache`, `route:cache`, and `view:cache` after the build to prime caches before syncing.
+2. **Sync the backend + frontend together**
+   - Use `sshpass rsync -az --delete` to mirror the repo to `~/zettelfix.de/preview` with an exclude list such as:
+
+     ```
+     --exclude ".git/" --exclude ".github/" --exclude "node_modules/" --exclude "vendor/"
+     --exclude "storage/" --exclude "tests/" --exclude "specs/" --exclude "Zettelfix-reloaded.bak/"
+     --exclude ".env" --exclude ".env.*"
+     ```
+
+   - The sync step must run from the repo root so directories like `app/`, `bootstrap/`, `config/`, `resources/`, `routes/`, and `public/` reach the server.
+3. **Remote post-sync commands**
+   - Execute a single SSH step (fail-fast) that runs:
+
+     ```bash
+     cd ~/zettelfix.de/preview
+     composer install --no-dev --optimize-autoloader --no-interaction
+     php artisan migrate --force
+     php artisan config:cache
+     php artisan route:cache
+     php artisan view:cache
+     php artisan storage:link
+     chmod -R ug+rwx storage bootstrap/cache
+     ```
+
+   - These commands assume `.env` already exists on the server with production secrets.
+4. **Logging & observability**
+   - Keep SSH output verbose (`-v`) when debugging, and allow the workflow to stop immediately if any remote command fails so the failed command is visible in the logs.
 
 ## Post-Deployment Checklist
 

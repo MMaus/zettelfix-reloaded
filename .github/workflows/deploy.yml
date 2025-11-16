@@ -41,27 +41,50 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openssh-client rsync sshpass
 
-      - name: Deploy to remote server
+      - name: Sync application to remote server
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          # Create the target directory if it doesn't exist
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" "mkdir -p ~/zettelfix.de/preview"
+          TARGET_DIR="~/zettelfix.de/preview"
           
-          # Copy build artifacts to remote server
-          sshpass -p "$SSH_PASSWORD" rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            public/build/ \
-            "$SSH_USERNAME@$SSH_HOST:~/zettelfix.de/preview/build/"
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" "mkdir -p $TARGET_DIR"
+          
+          EXCLUDES=(
+            "--exclude=.git/"
+            "--exclude=.github/"
+            "--exclude=node_modules/"
+            "--exclude=vendor/"
+            "--exclude=storage/"
+            "--exclude=tests/"
+            "--exclude=specs/"
+            "--exclude=Zettelfix-reloaded.bak/"
+            "--exclude=.env"
+            "--exclude=.env.*"
+          )
 
-      - name: Install PHP dependencies on server
+          sshpass -p "$SSH_PASSWORD" rsync -az --delete \
+            "${EXCLUDES[@]}" \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ \
+            "$SSH_USERNAME@$SSH_HOST:$TARGET_DIR/"
+
+      - name: Run remote post-deploy commands
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" \
-            "cd ~/zettelfix.de/preview && composer install --no-dev --optimize-autoloader"
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" <<'EOF'
+          set -euo pipefail
+          cd ~/zettelfix.de/preview
+          composer install --no-dev --optimize-autoloader --no-interaction
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan storage:link
+          chmod -R ug+rwx storage bootstrap/cache
+          EOF
 
