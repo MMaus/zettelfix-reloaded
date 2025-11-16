@@ -15,11 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          tools: composer:v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader
 
       - name: Install dependencies
         run: npm ci
@@ -46,4 +55,13 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             public/build/ \
             "$SSH_USERNAME@$SSH_HOST:~/zettelfix.de/preview/build/"
+
+      - name: Install PHP dependencies on server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" \
+            "cd ~/zettelfix.de/preview && composer install --no-dev --optimize-autoloader"
 
