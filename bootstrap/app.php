@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        // Disable CSRF token validation for all routes
+        $middleware->validateCsrfTokens(except: ['*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

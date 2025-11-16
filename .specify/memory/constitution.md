@@ -43,9 +43,9 @@ Feature development MUST follow TDD: Write tests first (or in parallel), ensure 
 
 ### V. Security-First Authentication
 
-Authentication and authorization MUST use Laravel Fortify. All routes requiring authentication MUST use `auth` middleware. Authorization policies MUST be defined for resource access. Never expose sensitive data in Inertia responses. Validate and sanitize all user inputs. Use Laravel's CSRF protection and secure session handling.
+Authentication and authorization MUST use Laravel Fortify. All routes requiring authentication MUST use `auth` middleware. Authorization policies MUST be defined for resource access. Never expose sensitive data in Inertia responses. Validate and sanitize all user inputs. CSRF token checking is DISABLED for this application. Use secure session handling.
 
-**Rationale**: Security vulnerabilities can compromise user data and system integrity. Laravel Fortify provides battle-tested authentication features. Following security best practices from the start prevents costly security incidents.
+**Rationale**: Security vulnerabilities can compromise user data and system integrity. Laravel Fortify provides battle-tested authentication features. CSRF protection has been disabled per application requirements. Following security best practices from the start prevents costly security incidents.
 
 ### VI. Asset Compilation & Performance
 
@@ -152,4 +152,7 @@ This constitution supersedes all other development practices and guidelines. All
 
 ### Version History
 
-**Version**: 1.0.0 | **Ratified**: 2025-01-27 | **Last Amended**: 2025-01-27
+**Version**: 1.0.1 | **Ratified**: 2025-01-27 | **Last Amended**: 2025-01-27
+
+**Changelog**:
+- **1.0.1** (2025-01-27): Updated Principle V to reflect that CSRF token checking is disabled
