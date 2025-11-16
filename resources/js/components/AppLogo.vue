@@ -8,9 +8,12 @@ import AppLogoIcon from '@/components/AppLogoIcon.vue';
     >
         <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
     </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
+    <a
+        href="https://zettelfix-preview.de"
+        class="ml-1 grid flex-1 text-left text-sm hover:opacity-80 transition-opacity"
+    >
         <span class="mb-0.5 truncate leading-tight font-semibold"
-            >Laravel Starter Kit</span
+            >Zettelfix</span
         >
-    </div>
+    </a>
 </template>

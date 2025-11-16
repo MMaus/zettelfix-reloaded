@@ -1,14 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->name('home');
 
 Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -33,7 +28,7 @@ Route::prefix('shopping')->name('shopping.')->group(function () {
     Route::put('/{shopping}', [App\Http\Controllers\ShoppingListItemController::class, 'update'])->name('update');
     Route::delete('/{shopping}', [App\Http\Controllers\ShoppingListItemController::class, 'destroy'])->name('destroy');
     Route::post('/checkout', [App\Http\Controllers\ShoppingListItemController::class, 'checkout'])->middleware('auth')->name('checkout');
-    
+
     // Shopping history routes (requires auth)
     Route::prefix('history')->name('history.')->middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\ShoppingHistoryController::class, 'index'])->name('index');
