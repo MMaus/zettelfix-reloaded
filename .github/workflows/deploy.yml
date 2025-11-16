@@ -77,6 +77,7 @@ jobs:
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USERNAME@$SSH_HOST" <<'EOF'
           set -euo pipefail
+          source ~/.bashrc
           cd ~/zettelfix.de/preview
           composer install --no-dev --optimize-autoloader --no-interaction
           php artisan migrate --force
