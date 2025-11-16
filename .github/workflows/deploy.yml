@@ -56,7 +56,6 @@ jobs:
             "--exclude=.github/"
             "--exclude=node_modules/"
             "--exclude=vendor/"
-            "--exclude=storage/"
             "--exclude=tests/"
             "--exclude=specs/"
             "--exclude=Zettelfix-reloaded.bak/"
