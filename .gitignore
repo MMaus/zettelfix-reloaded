@@ -26,3 +26,13 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Backup and build artifacts
+/dist
+/build
+/coverage
+/Zettelfix-reloaded.bak/
+
+# Additional logs and environment files
+*.log
+.env.*

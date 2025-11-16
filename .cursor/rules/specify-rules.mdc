@@ -1,0 +1,29 @@
+# Zettelfix-reloaded Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-11-16
+
+## Active Technologies
+
+- PHP 8.2+, TypeScript 5.2+ + Laravel 12.0, Vue 3.5, Inertia.js 2.0, Laravel Fortify 1.30, Vite 7.0, Tailwind CSS 4.1 (001-shopping-todo-sync)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+PHP 8.2+, TypeScript 5.2+: Follow standard conventions
+
+## Recent Changes
+
+- 001-shopping-todo-sync: Added PHP 8.2+, TypeScript 5.2+ + Laravel 12.0, Vue 3.5, Inertia.js 2.0, Laravel Fortify 1.30, Vite 7.0, Tailwind CSS 4.1
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
