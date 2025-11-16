@@ -11,26 +11,28 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { usePage } from '@inertiajs/vue3';
+import { login } from '@/routes';
+import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronsUpDown } from 'lucide-vue-next';
+import { computed } from 'vue';
 import UserMenuContent from './UserMenuContent.vue';
 
 const page = usePage();
-const user = page.props.auth.user;
+const user = computed(() => page.props.auth.user);
 const { isMobile, state } = useSidebar();
 </script>
 
 <template>
     <SidebarMenu>
         <SidebarMenuItem>
-            <DropdownMenu>
+            <DropdownMenu v-if="user">
                 <DropdownMenuTrigger as-child>
                     <SidebarMenuButton
                         size="lg"
                         class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         data-test="sidebar-menu-button"
                     >
-                        <UserInfo :user="user" />
+                        <UserInfo :user="user!" />
                         <ChevronsUpDown class="ml-auto size-4" />
                     </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -46,9 +48,20 @@ const { isMobile, state } = useSidebar();
                     align="end"
                     :side-offset="4"
                 >
-                    <UserMenuContent :user="user" />
+                    <UserMenuContent :user="user!" />
                 </DropdownMenuContent>
             </DropdownMenu>
+            <SidebarMenuButton
+                v-else
+                size="lg"
+                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                data-test="sidebar-menu-button"
+                as-child
+            >
+                <Link :href="login()" class="flex w-full items-center">
+                    Log in
+                </Link>
+            </SidebarMenuButton>
         </SidebarMenuItem>
     </SidebarMenu>
 </template>
