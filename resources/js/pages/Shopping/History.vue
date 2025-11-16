@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import type { ShoppingHistoryItem } from '@/types/shopping';
 import HistoryLibrary from '@/components/Shopping/HistoryLibrary.vue';
 import { Button } from '@/components/ui/button';
